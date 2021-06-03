@@ -1,30 +1,39 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-
+import moment from 'moment';
 const EditMovieForm = ({ movie }) => {
-  const [genres, setGenres] = useState([]);
-
   const [editedMovie, setEditedMovie] = useState([]);
-
-  useEffect(() => {
-    setEditedMovie(movie);
-    axios
-      .get("https://moviesapi2021.herokuapp.com/genres")
-      .then((response) => {
-        // Obtenemos los datos
-        //console.log(response.data.genres);
-        setGenres(response.data.genres);
-      })
-      .catch((e) => {
-        // Capturamos los errores
-        console.log(e);
-      });
-  }, [movie]);
+  const [genres, setGenres] = useState([]);
+  const [genreName, setGenreName] = useState([]);
 
   //Obtengo El Valor De Los Inputs
-  const { id, title, rating, release_date, length, awards, genre_id } =
+  var { id, title, rating, release_date, length , awards, genre_id } =
     editedMovie;
+  useEffect(() => {
+    setEditedMovie(movie);
+    const getAllGenres = axios.get(
+      "https://moviesapi2021.herokuapp.com/genres"
+    );
+    const getGenreById = axios.get(
+      `https://moviesapi2021.herokuapp.com/genres/detail/${genre_id}`
+    );
+    axios
+      .all([getAllGenres, getGenreById])
+      .then(
+        axios.spread((...responses) => {
+          const responseOne = responses[0];
+          setGenres(responseOne.data.genres);
+          const responseTwo = responses[1];
+          setGenreName(responseTwo.data.genre.name);
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.log(errors);
+      });
+  }, [movie, genre_id]);
+
   const onChange = (e) => {
     setEditedMovie({
       ...editedMovie,
@@ -49,9 +58,11 @@ const EditMovieForm = ({ movie }) => {
       return;
     }
 
-    console.log(editedMovie);
     axios
-      .post(`https://moviesapi2021.herokuapp.com/movies/update/${id}`, editedMovie)
+      .post(
+        `https://moviesapi2021.herokuapp.com/movies/update/${id}`,
+        editedMovie
+      )
       .then((res) => {
         //console.log(res);
         console.log(res.data);
@@ -126,7 +137,7 @@ const EditMovieForm = ({ movie }) => {
               placeholder="Ej. 13/10/2000"
               id="formGroupExampleInput4"
               onChange={onChange}
-              defaultValue={release_date}
+              defaultValue={release_date = moment().format('YYYY-MM-DD')}
               name="release_date"
             />
           </div>
@@ -142,7 +153,7 @@ const EditMovieForm = ({ movie }) => {
               placeholder="Ej. 120"
               id="formGroupExampleInput5"
               onChange={onChange}
-              defaultValue={length}
+              value={length}
               name="length"
             />
           </div>
@@ -157,7 +168,7 @@ const EditMovieForm = ({ movie }) => {
               onChange={onChange}
               defaultValue={genre_id}
             >
-              <option>Seleccione Un Genero</option>
+              <option>{genreName === null ? <></> : genreName}</option>
               {genres.map((genre) => (
                 <option value={genre.id}>{genre.name}</option>
               ))}

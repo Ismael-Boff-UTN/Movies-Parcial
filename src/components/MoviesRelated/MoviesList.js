@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Movie from "./Movie";
 import AddMovieForm from "./AddMovieForm";
-import { EatLoading } from 'react-loadingg';
+import { JumpCircleLoading } from "react-loadingg";
 
 const MoviesList = () => {
   const [movies, setMovies] = useState([]);
@@ -22,31 +22,33 @@ const MoviesList = () => {
   }, []);
   return (
     <>
-      <button
-        type="button"
-        className="btn btn-success mt-3 mb-3"
-        data-bs-toggle="modal"
-        data-bs-target="#staticBackdrop"
-      >
-        Agregar Nueva Pelicula
-      </button>
       {movies.length === 0 || null ? (
-        <EatLoading />
+        <JumpCircleLoading />
       ) : (
-        <table className="table table-hover">
-          <thead>
-            <tr>
-              <th scope="col">#ID</th>
-              <th scope="col">Nombre</th>
-              <th scope="col">Opciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {movies.map((movie) => (
-              <Movie key={movie.id} movie={movie} />
-            ))}
-          </tbody>
-        </table>
+        <>
+          <button
+            type="button"
+            className="btn btn-success mt-3 mb-3"
+            data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop"
+          >
+            Agregar Nueva Pelicula
+          </button>
+          <table className="table table-hover table-responsive">
+            <thead>
+              <tr>
+                <th scope="col">#ID</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Opciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {movies.map((movie) => (
+                <Movie key={movie.id} movie={movie} />
+              ))}
+            </tbody>
+          </table>
+        </>
       )}
       {/**Add Movie Modal */}
       <div
@@ -72,7 +74,7 @@ const MoviesList = () => {
               ></button>
             </div>
             <div class="modal-body">
-                <AddMovieForm/>
+              <AddMovieForm />
             </div>
             <div class="modal-footer">
               <button
@@ -82,7 +84,6 @@ const MoviesList = () => {
               >
                 Cancelar
               </button>
-             
             </div>
           </div>
         </div>
